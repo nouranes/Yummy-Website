@@ -41,9 +41,17 @@ $(".fa-bars").on("click", function () {
   }
 });
 // & End SideBar Box
+function showLoading() {
+  $(".loading-screen").css('display', 'flex').hide().fadeIn(300);
+}
+
+function hideLoading() {
+  $(".loading-screen").fadeOut(300);
+}
 
 // & fetch data from api
 async function getMeals(category, paramName = "", paramValue = "") {
+  showLoading();
   let url;
   
   if (category === "lookup") {
@@ -54,9 +62,16 @@ async function getMeals(category, paramName = "", paramValue = "") {
       : `https://www.themealdb.com/api/json/v1/1/${category}.php`;
   }
 
-  let response = await fetch(url);
-  let data = await response.json();
-  return data;
+try {
+    let response = await fetch(url);
+    let data = await response.json();
+    hideLoading(); 
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    hideLoading(); 
+    return { meals: null };
+  }
 }
 
 // &------------------------------------------------------------->
@@ -409,4 +424,10 @@ $(function () {
     });
   });
 });
-
+// *default category
+$(document).ready(function() {
+  
+  getMeals("categories").then((data) => {
+    displayCategories(data.categories);
+  });
+});
